@@ -1,0 +1,104 @@
+version: "2.2"
+services:
+  # Laravel app
+  backend:
+    # Use a custom image provided inside Dockerfile to build the app
+    build:
+      # use project root as build context so we can access all files
+      context: ../
+      dockerfile: docker/be.dockerfile
+    image: laravel/php
+    container_name: 3app-be
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: 3app-be
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ./../src/backend:/var/www
+      - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - 3app-network
+
+  # nuxt
+  frontend:
+    # Use a custom image for nuxt
+    build:
+      context: ../
+      dockerfile: docker/fe.dockerfile
+    container_name: 3app-fe
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      # old
+      - ./../src/frontend/:/app
+      - /app/node_modules
+      # new
+      # - ./../src/frontend/:/app:delegated
+      # - /app/node_modules:delegated
+    networks:
+      - 3app-network
+
+  # HTTP Server (nginx)
+  webserver:
+    image: nginx:alpine
+    container_name: 3app-webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./../src/backend:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - 3app-network
+
+  # MySQL Service (used only for development)
+  db:
+    image: mariadb:10.8.2
+    container_name: 3app-db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    volumes:
+      - 3appdb:/var/lib/mysql/
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    environment:
+      MYSQL_DATABASE: 3app
+      MYSQL_USER: 3app
+      MYSQL_PASSWORD: appDb123
+      MYSQL_ROOT_PASSWORD: rootDb123
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - 3app-network
+
+  # php my admin
+  pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    environment:
+      - PMA_HOST=3app-db
+      - UPLOAD_LIMIT=1G
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - /sessions
+    networks:
+      - 3app-network
+
+# Docker Networks
+networks:
+  3app-network:
+    driver: bridge
+
+# Volumes
+volumes:
+  # db data file (Should use local driver, since it has to persist in the container)
+  3appdb:
+    driver: local

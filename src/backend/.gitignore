@@ -1,0 +1,32 @@
+# Laravel specific
+.env
+.env.*
+vendor/
+node_modules/
+public/storage
+public/hot
+storage/*.key
+/storage/*.key
+Homestead.json
+Homestead.yaml
+npm-debug.log
+
+# PHPUnit
+/phpunit.xml
+
+# Composer
+composer.phar
+
+# Laravel Mix
+/public/mix-manifest.json
+/public/css/*
+/public/js/*
+
+# Laravel Telescope
+/telescope
+/storage/app/telescope
+
+# Laravel Dusk
+/.dusk
+tests/Browser/screenshots
+tests/Browser/console

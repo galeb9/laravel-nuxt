@@ -1,0 +1,29 @@
+# Ignore Node.js related files and directories
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore build artifacts
+dist/
+.nuxt/
+
+# Ignore environment configuration files
+.env
+.env.*
+
+# Ignore logs
+logs/
+
+# Ignore editor-related files
+.idea/
+.vscode/
+
+# Ignore development tools and files
+.DS_Store
+*.log
+*.tmp
+*.bak
+
+# Ignore OS generated files
+ehthumbs.db
+Thumbs.db
